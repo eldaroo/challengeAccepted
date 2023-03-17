@@ -9,4 +9,5 @@ public interface CartService {
     void addProduct(Integer cartId, Product product) throws InvalidCartIdException;
     Cart getCartById(Integer cartId) throws InvalidCartIdException;
     void removeCart(Integer cartId) throws InvalidCartIdException;
+    void cleanUpExpiredCarts();
 }

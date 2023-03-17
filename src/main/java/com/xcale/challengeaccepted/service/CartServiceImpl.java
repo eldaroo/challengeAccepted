@@ -52,6 +52,7 @@ public class CartServiceImpl implements CartService {
         }
     }
 
+    @Override
     @Scheduled(fixedRate = CLEAN_UP_EXPIRES_BG_TIME)
     public void cleanUpExpiredCarts() {
         carts = carts.entrySet()
