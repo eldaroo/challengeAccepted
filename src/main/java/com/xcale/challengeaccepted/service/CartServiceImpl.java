@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 public class CartServiceImpl implements CartService {
 
-    private final int CLEAN_UP_EXPIRES_BG_TIME = 60000; // 10 minutes
+    private final int CLEAN_UP_EXPIRES_BG_TIME = 6000; // 1 minute
     Map<Integer, Cart> carts = new HashMap<>();
     Integer uniqueId = 1;
 
