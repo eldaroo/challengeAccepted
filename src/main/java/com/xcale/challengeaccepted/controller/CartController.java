@@ -21,16 +21,16 @@ public class CartController {
     public ResponseEntity addProduct(@PathVariable("cartId") Integer cartId, @RequestBody Product product) {
         try {
             service.addProduct(cartId, product);
+            return new ResponseEntity<>("The product was successfully added", HttpStatus.ACCEPTED);
         } catch (InvalidCartIdException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{cartId}")
     public ResponseEntity getCartById(@PathVariable("cartId") Integer cartId) {
         try {
-            return new ResponseEntity<>(service.getCartById(cartId), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(service.getCartById(cartId).toString(), HttpStatus.ACCEPTED);
         } catch (InvalidCartIdException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
@@ -38,7 +38,7 @@ public class CartController {
 
     @PostMapping
     public ResponseEntity createCart() {
-        return new ResponseEntity<>(service.createCart(), HttpStatus.ACCEPTED);
+        return new ResponseEntity(service.createCart(), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{cartId}")
