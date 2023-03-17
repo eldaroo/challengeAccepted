@@ -1,5 +1,6 @@
 package com.xcale.challengeaccepted.controller;
 
+import com.xcale.challengeaccepted.exception.InvalidCartIdException;
 import com.xcale.challengeaccepted.model.Product;
 import com.xcale.challengeaccepted.service.CartServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,8 @@ public class CartController {
     public ResponseEntity addProduct(@PathVariable("cartId") Integer cartId, @RequestBody Product product) {
         try {
             service.addProduct(cartId, product);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+        } catch (InvalidCartIdException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok().build();
     }
@@ -30,8 +31,8 @@ public class CartController {
     public ResponseEntity getCartById(@PathVariable("cartId") Integer cartId) {
         try {
             return new ResponseEntity<>(service.getCartById(cartId), HttpStatus.ACCEPTED);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+        } catch (InvalidCartIdException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -45,8 +46,8 @@ public class CartController {
         try {
             service.removeCart(cartId);
             return new ResponseEntity<>("The cart was removed successfully", HttpStatus.ACCEPTED);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+        } catch (InvalidCartIdException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 }
