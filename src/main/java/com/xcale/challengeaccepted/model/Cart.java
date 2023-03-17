@@ -18,4 +18,9 @@ public class Cart {
     public boolean isExpired() {
         return System.currentTimeMillis() - creationTime > TTL;
     }
+
+    @Override
+    public String toString() {
+        return "products: " + products;
+    }
 }
