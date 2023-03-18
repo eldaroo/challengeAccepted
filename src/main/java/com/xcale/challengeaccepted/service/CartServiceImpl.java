@@ -41,6 +41,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void removeCart(String cartId) throws InvalidIdException {
+        getCart(cartId);
         carts.invalidate(cartId);
     }
 
