@@ -4,23 +4,23 @@ import java.util.Map;
 
 public class Cart {
     private final Map<Integer, Product> products = new HashMap<>();
-    private final long creationTime = System.currentTimeMillis();
-    private static final long TTL = 10 * 60 * 10000; // 10 minutes in milliseconds
-    Integer uniqueId = 1;
 
-    Integer getUniqueId() {
-        return uniqueId++;
-    }
-    public void addProduct(Product product) {
-        products.put(getUniqueId(), product);
+    public void addProduct(Product productToAdd) {
+        if (products.containsKey(productToAdd.getId())) {
+            Product product = products.get(productToAdd.getId());
+            product.setAmount(product.getAmount() + productToAdd.getAmount());
+        } else {
+            products.put(productToAdd.getId(), productToAdd);
+        }
     }
 
-    public boolean isExpired() {
-        return System.currentTimeMillis() - creationTime > TTL;
+    public Map<Integer, Product> getProducts() {
+        return products;
     }
 
     @Override
     public String toString() {
         return "products: " + products;
     }
+
 }
