@@ -1,15 +1,18 @@
 package com.xcale.challengeaccepted.service;
 
-import com.xcale.challengeaccepted.exception.InvalidCartIdException;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.xcale.challengeaccepted.constants.MessageConstants;
+import com.xcale.challengeaccepted.exception.InvalidIdException;
 import com.xcale.challengeaccepted.model.Cart;
 import com.xcale.challengeaccepted.model.Product;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class CartServiceImpl implements CartService {
+    Cache<String, Cart> carts = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
 
     String generateId() {
         return UUID.randomUUID().toString();
@@ -31,7 +34,7 @@ public class CartServiceImpl implements CartService {
     public Cart getCart(String cartId) throws InvalidIdException {
         Cart cart = carts.getIfPresent(cartId);
         if (cart == null) {
-            throw new InvalidCartIdException("Invalid cart ID: " + cartId);
+            throw new InvalidIdException(MessageConstants.INVALID_CART_ID_MSG + cartId);
         }
         return cart;
     }
@@ -41,12 +44,4 @@ public class CartServiceImpl implements CartService {
         carts.invalidate(getCart(cartId));
     }
 
-    @Override
-    @Scheduled(fixedRate = CLEAN_UP_EXPIRES_BG_TIME)
-    public void cleanUpExpiredCarts() {
-        carts = carts.entrySet()
-                .stream()
-                .filter(entry -> !entry.getValue().isExpired())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
 }
