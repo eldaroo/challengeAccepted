@@ -22,18 +22,18 @@ public class CartController {
     public ResponseEntity addProduct(@PathVariable("cartId") String cartId, @RequestBody Product product) {
         try {
             service.addProduct(cartId, product);
-            return new ResponseEntity<>("The product was successfully added", HttpStatus.ACCEPTED);
-        } catch (InvalidCartIdException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(MessageConstants.PRODUCT_SUCCESS_ADD_MSG, HttpStatus.ACCEPTED);
+        } catch (InvalidIdException e) {
+            return getErrorResponseEntity(e);
         }
     }
 
     @GetMapping("/{cartId}")
     public ResponseEntity getCart(@PathVariable("cartId") String cartId) {
         try {
-            return new ResponseEntity<>(service.getCartById(cartId).toString(), HttpStatus.ACCEPTED);
-        } catch (InvalidCartIdException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(service.getCart(cartId), HttpStatus.ACCEPTED);
+        } catch (InvalidIdException e) {
+            return getErrorResponseEntity(e);
         }
     }
 
@@ -46,9 +46,13 @@ public class CartController {
     public ResponseEntity removeCart(@PathVariable("cartId") String cartId) {
         try {
             service.removeCart(cartId);
-            return new ResponseEntity<>("The cart was removed successfully", HttpStatus.ACCEPTED);
-        } catch (InvalidCartIdException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(MessageConstants.CART_SUCCESS_REMOVE_MSG, HttpStatus.ACCEPTED);
+        } catch (InvalidIdException e) {
+            return getErrorResponseEntity(e);
         }
+    }
+
+    private static ResponseEntity getErrorResponseEntity(InvalidIdException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

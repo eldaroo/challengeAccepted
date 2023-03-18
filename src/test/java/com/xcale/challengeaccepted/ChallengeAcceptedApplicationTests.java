@@ -33,7 +33,7 @@ class ChallengeAcceptedApplicationTests {
         cartController.createCart();
         ResponseEntity<Cart> responseEntity = cartController.removeCart(FAKE_ID);
         assertEquals(HttpStatus.ACCEPTED, responseEntity.getStatusCode());
-        assertEquals("The cart was removed successfully", responseEntity.getBody());
+        assertEquals(MessageConstants.CART_SUCCESS_REMOVE_MSG, responseEntity.getBody());
     }
 
     @Test
