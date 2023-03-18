@@ -1,5 +1,6 @@
 package com.xcale.challengeaccepted;
 
+import com.xcale.challengeaccepted.constants.MessageConstants;
 import com.xcale.challengeaccepted.controller.CartController;
 import com.xcale.challengeaccepted.model.Cart;
 import com.xcale.challengeaccepted.model.Product;
@@ -18,6 +19,7 @@ class ChallengeAcceptedApplicationTests {
     @Autowired
     private CartController cartController;
     private final Integer FAKE_ID = 1;
+    private final String FAKE_CART_ID = "ee2fe7ff-8bca-4ebc-ba9c-c895e1480e76";
     private final String FAKE_DESCRIPTION = "I need all the products in black";
     private final Integer FAKE_AMOUNT = 3;
 
@@ -30,38 +32,42 @@ class ChallengeAcceptedApplicationTests {
 
     @Test
     public void testRemoveCartSuccessfully() {
-        cartController.createCart();
-        ResponseEntity<Cart> responseEntity = cartController.removeCart(FAKE_ID);
+        ResponseEntity<Cart> creationResponse = cartController.createCart();
+        ResponseEntity<Cart> responseEntity = cartController.removeCart(getCartId(creationResponse));
         assertEquals(HttpStatus.ACCEPTED, responseEntity.getStatusCode());
         assertEquals(MessageConstants.CART_SUCCESS_REMOVE_MSG, responseEntity.getBody());
     }
 
     @Test
     public void testRemoveCartDoesNotExist() {
-        ResponseEntity<Cart> responseEntity = cartController.removeCart(FAKE_ID);
+        ResponseEntity<Cart> responseEntity = cartController.removeCart(FAKE_CART_ID);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals("Invalid cart ID: 1", responseEntity.getBody());
     }
 
     @Test
     public void testAddProduct() {
-        cartController.createCart();
+        ResponseEntity<Cart> creationResponse = cartController.createCart();
         Product product = new Product();
-        ResponseEntity<Cart> responseEntity = cartController.addProduct(FAKE_ID, product);
-        assertEquals(HttpStatus.ACCEPTED, responseEntity.getStatusCode());
-        assertEquals("The product was successfully added", responseEntity.getBody());
+        ResponseEntity<Cart> additionResponse = cartController.addProduct(getCartId(creationResponse), product);
+        assertEquals(HttpStatus.ACCEPTED, additionResponse.getStatusCode());
+        assertEquals(MessageConstants.PRODUCT_SUCCESS_ADD_MSG, additionResponse.getBody());
     }
 
     @Test
-    public void testGetCartById() {
-        cartController.createCart();
+    public void testGetCartWithProducts() {
+        ResponseEntity<Cart> creationResponse = cartController.createCart();
         Product product = new Product();
         product.setAmount(FAKE_AMOUNT);
         product.setDescription(FAKE_DESCRIPTION);
         product.setId(FAKE_ID);
-        cartController.addProduct(FAKE_ID, product);
-        ResponseEntity<Cart> responseEntity = cartController.getCartById(FAKE_ID);
-        assertEquals(HttpStatus.ACCEPTED, responseEntity.getStatusCode());
-        assertEquals("products: {1=Product [id=1, description=I need all the products in black, amount=3]}", responseEntity.getBody());
+        cartController.addProduct(getCartId(creationResponse), product);
+        ResponseEntity<Cart> gettingResponse = cartController.getCart(getCartId(creationResponse));
+        assertEquals(HttpStatus.ACCEPTED, gettingResponse.getStatusCode());
+        assertEquals("products: {1=Product [id=1, description=I need all the products in black, amount=3]}",  getCartId(gettingResponse));
+    }
+
+    private String getCartId(ResponseEntity responseEntity) {
+        return responseEntity.getBody().toString();
     }
 }
