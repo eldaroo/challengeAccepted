@@ -5,40 +5,31 @@ import com.xcale.challengeaccepted.model.Cart;
 import com.xcale.challengeaccepted.model.Product;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class CartServiceImpl implements CartService {
 
-    private final int CLEAN_UP_EXPIRES_BG_TIME = 6000; // 1 minute
-    Map<Integer, Cart> carts = new HashMap<>();
-    Integer uniqueId = 1;
-
-    Integer getUniqueId() {
-        return uniqueId++;
+    String generateId() {
+        return UUID.randomUUID().toString();
     }
     @Override
-    public Integer createCart() {
-        Integer cartId = getUniqueId();
+    public String createCart() {
+        String cartId = generateId();
         carts.put(cartId, new Cart());
         return cartId;
     }
 
     @Override
-    public void addProduct(Integer cartId, Product product) throws InvalidCartIdException {
-        Cart cart = carts.get(cartId);
-        if (cart == null) {
-            throw new InvalidCartIdException("Invalid cart ID: " + cartId);
-        }
+    public void addProduct(String cartId, Product product) throws InvalidIdException {
+        Cart cart = getCart(cartId);
         cart.addProduct(product);
     }
 
     @Override
-    public Cart getCartById(Integer cartId) throws InvalidCartIdException{
-        Cart cart = carts.get(cartId);
+    public Cart getCart(String cartId) throws InvalidIdException {
+        Cart cart = carts.getIfPresent(cartId);
         if (cart == null) {
             throw new InvalidCartIdException("Invalid cart ID: " + cartId);
         }
@@ -46,10 +37,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void removeCart(Integer cartId) throws InvalidCartIdException {
-        if (carts.remove(cartId) == null) {
-            throw new InvalidCartIdException("Invalid cart ID: " + cartId);
-        }
+    public void removeCart(String cartId) throws InvalidIdException {
+        carts.invalidate(getCart(cartId));
     }
 
     @Override
