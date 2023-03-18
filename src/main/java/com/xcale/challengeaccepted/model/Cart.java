@@ -1,4 +1,6 @@
 package com.xcale.challengeaccepted.model;
+import com.google.common.base.Objects;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,4 +25,16 @@ public class Cart {
         return "products: " + products;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cart cart = (Cart) o;
+        return Objects.equal(products, cart.products);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(products);
+    }
 }
