@@ -20,7 +20,7 @@ class ChallengeAcceptedApplicationTests {
     private CartController cartController;
     private final Integer FAKE_ID = 1;
     private final String FAKE_CART_ID = "ee2fe7ff-8bca-4ebc-ba9c-c895e1480e76";
-    private final String FAKE_DESCRIPTION = "I need all the products in black";
+    private final String FAKE_DESCRIPTION = "Fake Product";
     private final Integer FAKE_AMOUNT = 3;
 
     @Test
@@ -42,7 +42,7 @@ class ChallengeAcceptedApplicationTests {
     public void testRemoveCartDoesNotExist() {
         ResponseEntity<Cart> responseEntity = cartController.removeCart(FAKE_CART_ID);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-        assertEquals("Invalid cart ID: 1", responseEntity.getBody());
+        assertEquals("Invalid cart ID: "+FAKE_CART_ID, responseEntity.getBody());
     }
 
     @Test
@@ -56,15 +56,49 @@ class ChallengeAcceptedApplicationTests {
 
     @Test
     public void testGetCartWithProducts() {
+        Product product = getProduct();
+        Cart expected = new Cart();
+        expected.addProduct(product);
+
+        String cartId = createCarWith(product);
+        validateExpected(expected, cartId);
+    }
+
+    @Test
+    public void testAddExistingProduct(){
+        Product product = getProduct();
+
+        Cart expected = new Cart();
+        expected.addProduct(product);
+        expected.addProduct(product);
+
+        product.setAmount(FAKE_AMOUNT*2);
+        String cartId = createCarWith(product);
+
+        assertEquals(1, expected.getProducts().size());
+        assertEquals(FAKE_AMOUNT*2, expected.getProducts().values().stream().findFirst().get().getAmount());
+        validateExpected(expected, cartId);
+    }
+
+    private void validateExpected(Cart expected, String cartId) {
+        ResponseEntity<Cart> gettingResponse = cartController.getCart(cartId);
+        assertEquals(HttpStatus.ACCEPTED, gettingResponse.getStatusCode());
+        assertEquals(expected,  gettingResponse.getBody());
+    }
+
+    private String createCarWith(Product product) {
         ResponseEntity<Cart> creationResponse = cartController.createCart();
+        String cartId = getCartId(creationResponse);
+        cartController.addProduct(cartId, product);
+        return cartId;
+    }
+
+    private Product getProduct() {
         Product product = new Product();
         product.setAmount(FAKE_AMOUNT);
         product.setDescription(FAKE_DESCRIPTION);
         product.setId(FAKE_ID);
-        cartController.addProduct(getCartId(creationResponse), product);
-        ResponseEntity<Cart> gettingResponse = cartController.getCart(getCartId(creationResponse));
-        assertEquals(HttpStatus.ACCEPTED, gettingResponse.getStatusCode());
-        assertEquals("products: {1=Product [id=1, description=I need all the products in black, amount=3]}",  getCartId(gettingResponse));
+        return product;
     }
 
     private String getCartId(ResponseEntity responseEntity) {
