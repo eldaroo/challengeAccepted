@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class CartServiceImpl implements CartService {
-    Cache<String, Cart> carts = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
+    Cache<String, Cart> carts = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build();
 
     String generateId() {
         return UUID.randomUUID().toString();
